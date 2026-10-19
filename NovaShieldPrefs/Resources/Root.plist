@@ -13,7 +13,7 @@
             <key>title</key>
             <string>NovaShield Engine</string>
             <key>footerText</key>
-            <string>Engineered specifically for A10 Fusion (iPhone 7 Plus) on iOS 15.8.x. Solves thermalmonitord watchdog loops, I2C bus stalls, and heavy MLBB/Telegram gaming frame drops.</string>
+            <string>Engineered specifically for A10 Fusion (iPhone 7 Plus) on iOS 15.8.x. Solves thermalmonitord watchdog loops, thermal charging throttling, and heavy MLBB/Telegram gaming frame drops.</string>
         </dict>
 
         <!-- Master Switch -->
@@ -28,6 +28,59 @@
             <string>enabled</string>
             <key>label</key>
             <string>Master Engine Switch</string>
+            <key>PostNotification</key>
+            <string>com.novashield.prefs.changed</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.novashield.prefs</string>
+            <key>key</key>
+            <string>bootBanner</string>
+            <key>label</key>
+            <string>On-Screen Proof Banner</string>
+            <key>PostNotification</key>
+            <string>com.novashield.prefs.changed</string>
+        </dict>
+
+        <!-- Global Super Fast Charger Group -->
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>title</key>
+            <string>⚡️ Global Super Fast Charger</string>
+            <key>footerText</key>
+            <string>• Super Fast Charger: Unlocks full 2.1A/2.4A current on iPhone 7 Plus by preventing thermal throttling.
+• Charge Heat Shield: Automatically throttles heavy indexing daemons (backupd, suggestd, cloudphoto) while charging to keep battery &lt;36°C.</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.novashield.prefs</string>
+            <key>key</key>
+            <string>fastChargeEnabled</string>
+            <key>label</key>
+            <string>Global Super Fast Charge</string>
+            <key>PostNotification</key>
+            <string>com.novashield.prefs.changed</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.novashield.prefs</string>
+            <key>key</key>
+            <string>chargeHeatShield</string>
+            <key>label</key>
+            <string>Charge Heat Shield</string>
             <key>PostNotification</key>
             <string>com.novashield.prefs.changed</string>
         </dict>
@@ -67,8 +120,8 @@
             <key>title</key>
             <string>Gaming &amp; Foreground Protection</string>
             <key>footerText</key>
-            <string>• Auto-Boost Gaming: Automatically boosts thread priority and purges caches when Mobile Legends: Bang Bang (MLBB) or Telegram is opened.
-• Daemon Throttle: Throttles runaway background daemons (suggestd, passd, assetd) that trigger watchdog panics on A10.</string>
+            <string>• Auto-Boost Gaming: Elevates thread priority and purges caches when Mobile Legends: Bang Bang (MLBB) or Telegram is opened.
+• Daemon Throttle: Throttles runaway background daemons that trigger watchdog panics on A10.</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -104,7 +157,15 @@
             <key>cell</key>
             <string>PSGroupCell</string>
             <key>title</key>
-            <string>Actions &amp; Preview</string>
+            <string>Live Screen Reaction Previews</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSButtonCell</string>
+            <key>label</key>
+            <string>⚡️ Test Super Fast Charge HUD</string>
+            <key>action</key>
+            <string>testChargeHUD</string>
         </dict>
         <dict>
             <key>cell</key>
