@@ -1,5 +1,6 @@
 #import "RootListController.h"
 #import <notify.h>
+#import <spawn.h>
 
 @implementation NovaShieldRootListController
 
@@ -11,7 +12,7 @@
 }
 
 - (void)testHUD {
-    // Notify SpringBoard to display a test HUD preview
+    // Post Darwin notification to SpringBoard to test NovaHUD preview
     notify_post("com.novashield.testhud");
     
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"⚡️ NovaHUD Triggered"
