@@ -18,5 +18,10 @@ include $(THEOS_MAKE_PATH)/tweak.mk
 SUBPROJECTS += NovaShieldPrefs
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
+before-package::
+	@mkdir -p $(THEOS_STAGING_DIR)/DEBIAN
+	@if [ -f layout/DEBIAN/postinst ]; then cp layout/DEBIAN/postinst $(THEOS_STAGING_DIR)/DEBIAN/postinst && chmod 0755 $(THEOS_STAGING_DIR)/DEBIAN/postinst; fi
+	@if [ -f layout/DEBIAN/postrm ]; then cp layout/DEBIAN/postrm $(THEOS_STAGING_DIR)/DEBIAN/postrm && chmod 0755 $(THEOS_STAGING_DIR)/DEBIAN/postrm; fi
+
 after-install::
 	install.exec "killall -9 SpringBoard || true"
