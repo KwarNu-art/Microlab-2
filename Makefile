@@ -9,7 +9,7 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = NovaShield
 
 NovaShield_FILES = src/Tweak.x src/NovaHUD.m
-NovaShield_CFLAGS = -fobjc-arc -O3 -flto -DNDEBUG -Wno-unused-variable -Wno-deprecated-declarations
+NovaShield_CFLAGS = -fobjc-arc -O2 -DNDEBUG -Wno-unused-variable -Wno-deprecated-declarations
 NovaShield_FRAMEWORKS = UIKit Foundation CoreGraphics QuartzCore AudioToolbox
 NovaShield_LIBRARIES = substrate
 
