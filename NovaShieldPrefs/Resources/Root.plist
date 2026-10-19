@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <!-- Header Group -->
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>headerCellClass</key>
+            <string>HBPackageNameHeaderCell</string>
+            <key>title</key>
+            <string>NovaShield Engine</string>
+            <key>footerText</key>
+            <string>Engineered specifically for A10 Fusion (iPhone 7 Plus) on iOS 15.8.x. Solves thermalmonitord watchdog loops, I2C bus stalls, and heavy MLBB/Telegram gaming frame drops.</string>
+        </dict>
+
+        <!-- Master Switch -->
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.novashield.prefs</string>
+            <key>key</key>
+            <string>enabled</string>
+            <key>label</key>
+            <string>Master Engine Switch</string>
+            <key>PostNotification</key>
+            <string>com.novashield.prefs.changed</string>
+        </dict>
+
+        <!-- Thermal & CPU Threshold Group -->
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>title</key>
+            <string>CPU Warning &amp; Telemetry Threshold</string>
+            <key>footerText</key>
+            <string>When kernel CPU load exceeds this percentage for 3 consecutive checks, NovaHUD will slide in automatically.</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSliderCell</string>
+            <key>default</key>
+            <real>80</real>
+            <key>min</key>
+            <real>60</real>
+            <key>max</key>
+            <real>95</real>
+            <key>showValue</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.novashield.prefs</string>
+            <key>key</key>
+            <string>cpuThreshold</string>
+            <key>PostNotification</key>
+            <string>com.novashield.prefs.changed</string>
+        </dict>
+
+        <!-- Gaming & Rescue Group -->
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>title</key>
+            <string>Gaming &amp; Foreground Protection</string>
+            <key>footerText</key>
+            <string>• Auto-Boost Gaming: Automatically boosts thread priority and purges caches when Mobile Legends: Bang Bang (MLBB) or Telegram is opened.
+• Daemon Throttle: Throttles runaway background daemons (suggestd, passd, assetd) that trigger watchdog panics on A10.</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.novashield.prefs</string>
+            <key>key</key>
+            <string>autoBoostGaming</string>
+            <key>label</key>
+            <string>Auto-Boost MLBB &amp; Telegram</string>
+            <key>PostNotification</key>
+            <string>com.novashield.prefs.changed</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.novashield.prefs</string>
+            <key>key</key>
+            <string>daemonThrottle</string>
+            <key>label</key>
+            <string>Throttle Runaway Daemons</string>
+            <key>PostNotification</key>
+            <string>com.novashield.prefs.changed</string>
+        </dict>
+
+        <!-- Action / Testing Group -->
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>title</key>
+            <string>Actions &amp; Preview</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSButtonCell</string>
+            <key>label</key>
+            <string>⚡️ Test Warning HUD Preview</string>
+            <key>action</key>
+            <string>testHUD</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSButtonCell</string>
+            <key>label</key>
+            <string>Restart SpringBoard (Apply)</string>
+            <key>action</key>
+            <string>respring</string>
+        </dict>
+
+        <!-- About Group -->
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>title</key>
+            <string>Project Information</string>
+            <key>footerText</key>
+            <string>NovaShield for Microlab-2 • Built for Dopamine &amp; Palera1n (Rootless arm64)</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSButtonCell</string>
+            <key>label</key>
+            <string>GitHub Repository (Microlab-2)</string>
+            <key>action</key>
+            <string>openGitHub</string>
+        </dict>
+    </array>
+    <key>title</key>
+    <string>NovaShield⚡️</string>
+</dict>
+</plist>
