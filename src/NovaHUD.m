@@ -122,6 +122,66 @@
     return !self.hidden && self.alpha > 0.01;
 }
 
+- (void)showBootBanner {
+    [self.autoDismissTimer invalidate];
+
+    self.titleLabel.text = @"⚡️ NovaShield Online";
+    self.statusLabel.text = @"A10 Rescue & Super Fast Charge";
+    self.statsLabel.text = @"SpringBoard Hooked • 0% Standby Drain";
+    self.pulseDot.backgroundColor = [UIColor colorWithRed:0.2 green:0.95 blue:0.45 alpha:1.0];
+    self.blurView.layer.borderColor = [UIColor colorWithRed:0.2 green:0.85 blue:0.4 alpha:0.45].CGColor;
+    [self.boostButton setTitle:@"✅ Active" forState:UIControlStateNormal];
+    self.boostButton.backgroundColor = [UIColor colorWithRed:0.1 green:0.7 blue:0.3 alpha:0.95];
+
+    if (!self.isVisible) {
+        self.hidden = NO;
+        self.alpha = 0.0;
+        self.transform = CGAffineTransformMakeTranslation(0, -60.0);
+
+        [UIView animateWithDuration:0.55
+                              delay:0.0
+             usingSpringWithDamping:0.75
+              initialSpringVelocity:0.4
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:^{
+            self.alpha = 1.0;
+            self.transform = CGAffineTransformIdentity;
+        } completion:nil];
+    }
+
+    self.autoDismissTimer = [NSTimer scheduledTimerWithTimeInterval:4.5 target:self selector:@selector(autoDismiss) userInfo:nil repeats:NO];
+}
+
+- (void)showChargingHUDWithLevel:(int)batteryLevel isFastCharge:(BOOL)isFastCharge {
+    [self.autoDismissTimer invalidate];
+
+    self.titleLabel.text = isFastCharge ? @"⚡️ Super Fast Charger (A10)" : @"⚡️ Smart Battery Charging";
+    self.statusLabel.text = isFastCharge ? @"Thermal Throttling Bypassed • 2.1A Max" : @"A10 Low-Heat Safe Charge";
+    self.statsLabel.text = [NSString stringWithFormat:@"Battery: %d%% • Background Freezing Active", batteryLevel];
+    self.pulseDot.backgroundColor = [UIColor colorWithRed:0.0 green:0.95 blue:1.0 alpha:1.0];
+    self.blurView.layer.borderColor = [UIColor colorWithRed:0.0 green:0.8 blue:1.0 alpha:0.55].CGColor;
+    [self.boostButton setTitle:isFastCharge ? @"⚡️ Turbo" : @"🔋 Charging" forState:UIControlStateNormal];
+    self.boostButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.55 blue:0.95 alpha:0.95];
+
+    if (!self.isVisible) {
+        self.hidden = NO;
+        self.alpha = 0.0;
+        self.transform = CGAffineTransformMakeTranslation(0, -60.0);
+
+        [UIView animateWithDuration:0.55
+                              delay:0.0
+             usingSpringWithDamping:0.75
+              initialSpringVelocity:0.4
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:^{
+            self.alpha = 1.0;
+            self.transform = CGAffineTransformIdentity;
+        } completion:nil];
+    }
+
+    self.autoDismissTimer = [NSTimer scheduledTimerWithTimeInterval:4.5 target:self selector:@selector(autoDismiss) userInfo:nil repeats:NO];
+}
+
 - (void)showWithCPU:(float)cpuPercent memoryMB:(float)memoryMB isGaming:(BOOL)isGaming {
     [self.autoDismissTimer invalidate];
 
@@ -138,6 +198,9 @@
         self.pulseDot.backgroundColor = [UIColor colorWithRed:1.0 green:0.65 blue:0.0 alpha:1.0];
         self.blurView.layer.borderColor = [UIColor colorWithRed:0.2 green:0.7 blue:1.0 alpha:0.35].CGColor;
     }
+
+    [self.boostButton setTitle:@"⚡️ Boost & Cool" forState:UIControlStateNormal];
+    self.boostButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.55 blue:1.0 alpha:0.95];
 
     if (!self.isVisible) {
         self.hidden = NO;
