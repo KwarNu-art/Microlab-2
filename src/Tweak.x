@@ -297,6 +297,16 @@ static void StopTelemetry(void) {
                 isScreenAwake = NO;
                 StopTelemetry();
             });
+
+            // Register for test HUD preview notification from Preferences
+            int testToken = 0;
+            notify_register_dispatch("com.novashield.testhud", &testToken, dispatch_get_main_queue(), ^(int t) {
+                NovaHUD *hud = [NovaHUD sharedInstance];
+                hud.onRescueTapped = ^{
+                    ExecuteNovaRescue();
+                };
+                [hud showWithCPU:91.5f memoryMB:GetResidentMemoryMB() isGaming:YES];
+            });
         }
     }
 }
