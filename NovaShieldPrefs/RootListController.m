@@ -11,10 +11,21 @@
     return _specifiers;
 }
 
+- (void)testChargeHUD {
+    // Post Darwin notification to SpringBoard to test Super Fast Charge HUD
+    notify_post("com.novashield.testcharge");
+
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"⚡️ Super Fast Charger Active"
+                                                                   message:@"The Super Fast Charge HUD has been displayed on screen. Thermal throttling is bypassed and heavy background daemons are throttled."
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 - (void)testHUD {
     // Post Darwin notification to SpringBoard to test NovaHUD preview
     notify_post("com.novashield.testhud");
-    
+
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"⚡️ NovaHUD Triggered"
                                                                    message:@"The blurred glassmorphism HUD has been dispatched to SpringBoard. Swipe up on the HUD or tap 'Boost & Cool' to interact."
                                                             preferredStyle:UIAlertControllerStyleAlert];
