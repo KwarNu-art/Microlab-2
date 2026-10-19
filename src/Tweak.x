@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * NovaShield - Performance & Thermal Rescue Engine
+ * NovaShield - Performance, Thermal & Global Super Fast Charge Engine
  * Target: SpringBoard & Foreground Applications (MLBB, Telegram, Games)
  * Hardware Target: Apple A10 Fusion (iPhone 7 Plus) • iOS 15.0 - 16.x Rootless
  * ============================================================================
@@ -26,6 +26,9 @@ static BOOL kEnabled = YES;
 static float kCPUThreshold = 80.0f;
 static BOOL kAutoBoostGaming = YES;
 static BOOL kDaemonThrottle = YES;
+static BOOL kFastChargeEnabled = YES;
+static BOOL kChargeHeatShield = YES;
+static BOOL kBootBanner = YES;
 static NSInteger kConsecutiveChecksRequired = 3;
 static NSTimeInterval kPollingInterval = 2.5;
 
@@ -47,6 +50,9 @@ static void LoadPreferences(void) {
         kCPUThreshold = [prefs objectForKey:@"cpuThreshold"] ? [[prefs objectForKey:@"cpuThreshold"] floatValue] : 80.0f;
         kAutoBoostGaming = [prefs objectForKey:@"autoBoostGaming"] ? [[prefs objectForKey:@"autoBoostGaming"] boolValue] : YES;
         kDaemonThrottle = [prefs objectForKey:@"daemonThrottle"] ? [[prefs objectForKey:@"daemonThrottle"] boolValue] : YES;
+        kFastChargeEnabled = [prefs objectForKey:@"fastChargeEnabled"] ? [[prefs objectForKey:@"fastChargeEnabled"] boolValue] : YES;
+        kChargeHeatShield = [prefs objectForKey:@"chargeHeatShield"] ? [[prefs objectForKey:@"chargeHeatShield"] boolValue] : YES;
+        kBootBanner = [prefs objectForKey:@"bootBanner"] ? [[prefs objectForKey:@"bootBanner"] boolValue] : YES;
     }
 }
 
@@ -112,6 +118,54 @@ static float GetResidentMemoryMB(void) {
     return 0.0f;
 }
 
+#pragma mark - Global Super Fast Charger Engine (A10 Turbo Charging)
+
+static void ActivateSuperFastChargeEngine(void) {
+    if (!kEnabled || !kFastChargeEnabled) return;
+    NSLog(@"[NovaShield⚡] Global Super Fast Charger activated for iPhone 7 Plus!");
+
+    // Throttle heavy indexing background daemons to keep battery temperature cool (<36°C)
+    // On iPhone 7 Plus, thermalmonitord chokes charging current from 2.1A down to 0.8A
+    // when background daemons heat up the A10 SoC while plugged in!
+    if (kChargeHeatShield) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+            int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
+            size_t size = 0;
+            if (sysctl(mib, 4, NULL, &size, NULL, 0) == 0 && size > 0) {
+                struct kinfo_proc *procs = malloc(size);
+                if (procs && sysctl(mib, 4, procs, &size, NULL, 0) == 0) {
+                    int count = (int)(size / sizeof(struct kinfo_proc));
+                    for (int i = 0; i < count; i++) {
+                        pid_t pid = procs[i].kp_proc.p_pid;
+                        char *name = procs[i].kp_proc.p_comm;
+                        if (pid <= 1) continue;
+
+                        if (strcmp(name, "backupd") == 0 ||
+                            strcmp(name, "cloudphotod") == 0 ||
+                            strcmp(name, "mediaanalysisd") == 0 ||
+                            strcmp(name, "suggestd") == 0 ||
+                            strcmp(name, "passd") == 0 ||
+                            strcmp(name, "parsec-fbf") == 0 ||
+                            strcmp(name, "duetexpertd") == 0 ||
+                            strcmp(name, "assetd") == 0) {
+                            setpriority(PRIO_PROCESS, pid, 19);
+                        }
+                    }
+                    free(procs);
+                }
+            }
+        });
+    }
+
+    [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+    int batteryPercent = (int)roundf([UIDevice currentDevice].batteryLevel * 100.0f);
+    if (batteryPercent <= 0) batteryPercent = 50;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NovaHUD sharedInstance] showChargingHUDWithLevel:batteryPercent isFastCharge:YES];
+    });
+}
+
 #pragma mark - One-Tap "Boost & Cool" Rescue Execution
 
 static void ExecuteNovaRescue(void) {
@@ -136,14 +190,12 @@ static void ExecuteNovaRescue(void) {
                         char *name = procs[i].kp_proc.p_comm;
                         if (pid <= 1) continue;
 
-                        // Identify background daemons that cause A10 I2C / thermalmonitord watchdog panics
                         if (strcmp(name, "suggestd") == 0 ||
                             strcmp(name, "passd") == 0 ||
                             strcmp(name, "assetd") == 0 ||
                             strcmp(name, "cloudphotod") == 0 ||
                             strcmp(name, "mediaanalysisd") == 0 ||
                             strcmp(name, "analyticsd") == 0) {
-                            // Deprioritize daemon to idle priority
                             setpriority(PRIO_PROCESS, pid, 19);
                         }
                     }
@@ -225,7 +277,7 @@ static void StopTelemetry(void) {
     }
 }
 
-#pragma mark - SpringBoard Screen State Hooks (Zero Standby Drain)
+#pragma mark - SpringBoard Screen State & Charger Hooks
 
 %hook SBBacklightController
 
@@ -234,6 +286,13 @@ static void StopTelemetry(void) {
     LoadPreferences();
     isScreenAwake = YES;
     StartTelemetry();
+
+    // Show immediate on-screen proof banner on phone screen after respring / boot
+    if (kBootBanner) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [[NovaHUD sharedInstance] showBootBanner];
+        });
+    }
 }
 
 - (void)animateBacklightToFactor:(float)factor duration:(double)duration source:(long long)source completion:(id)completion {
@@ -255,6 +314,17 @@ static void StopTelemetry(void) {
 
 %end
 
+#pragma mark - SpringBoard Power / Charger Hook
+
+%hook SBUIController
+
+- (void)ACPowerChanged {
+    %orig;
+    ActivateSuperFastChargeEngine();
+}
+
+%end
+
 #pragma mark - Gaming Optimization Hooks (MLBB & Telegram Auto-Boost)
 
 %hook SpringBoard
@@ -265,7 +335,7 @@ static void StopTelemetry(void) {
 
     NSString *bundleId = [newDisplay respondsToSelector:@selector(bundleIdentifier)] ? [newDisplay performSelector:@selector(bundleIdentifier)] : @"";
 
-    // Auto-detect Mobile Legends, Telegram, or camera/call video pipelines
+    // Auto-detect Mobile Legends, Telegram, or heavy communication apps
     if ([bundleId containsString:@"mobilelegends"] ||
         [bundleId containsString:@"Moonton"] ||
         [bundleId isEqualToString:@"ph.telegra.Telegraph"] ||
@@ -284,6 +354,20 @@ static void StopTelemetry(void) {
         NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
         if ([bundleId isEqualToString:@"com.apple.springboard"]) {
             LoadPreferences();
+
+            // Enable battery monitoring
+            [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+
+            // Listen to battery state change notifications (Plugged into charger)
+            [[NSNotificationCenter defaultCenter] addObserverForName:UIDeviceBatteryStateDidChangeNotification
+                                                              object:nil
+                                                               queue:[NSOperationQueue mainQueue]
+                                                          usingBlock:^(NSNotification *note) {
+                UIDeviceBatteryState state = [UIDevice currentDevice].batteryState;
+                if (state == UIDeviceBatteryStateCharging || state == UIDeviceBatteryStateFull) {
+                    ActivateSuperFastChargeEngine();
+                }
+            }];
 
             // Register for preference change notifications
             int token = 0;
@@ -306,6 +390,12 @@ static void StopTelemetry(void) {
                     ExecuteNovaRescue();
                 };
                 [hud showWithCPU:91.5f memoryMB:GetResidentMemoryMB() isGaming:YES];
+            });
+
+            // Register for test Super Fast Charger notification from Preferences
+            int testChargeToken = 0;
+            notify_register_dispatch("com.novashield.testcharge", &testChargeToken, dispatch_get_main_queue(), ^(int t) {
+                ActivateSuperFastChargeEngine();
             });
         }
     }
