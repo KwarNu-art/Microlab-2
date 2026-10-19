@@ -11,6 +11,8 @@ typedef void(^NovaRescueActionHandler)(void);
 
 + (instancetype)sharedInstance;
 - (void)showWithCPU:(float)cpuPercent memoryMB:(float)memoryMB isGaming:(BOOL)isGaming;
+- (void)showBootBanner;
+- (void)showChargingHUDWithLevel:(int)batteryLevel isFastCharge:(BOOL)isFastCharge;
 - (void)dismissAnimated:(BOOL)animated;
 - (void)flashSuccessWithStatus:(NSString *)statusText;
 
